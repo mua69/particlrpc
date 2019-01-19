@@ -102,7 +102,7 @@ type Tx struct {
 	Blockhash string   `json:"blockhash"`
 }
 
-type RpcResponse struct {
+type rpcResponse struct {
 	Result interface{}
 	Err    string `json:"error"`
 	Id     int
@@ -227,7 +227,7 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 		return errors.Wrapf(err, "partRpc: Bad response status: %s", resp.Status)
 	}
 
-	response := RpcResponse{}
+	response := rpcResponse{}
 	response.Result = res
 
 	decoder := json.NewDecoder(resp.Body)
