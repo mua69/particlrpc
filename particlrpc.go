@@ -207,7 +207,7 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "partRpc: JSON Marshal")
+		return errors.Wrap(err, "JSON Marshal failed")
 	}
 
 	url := fmt.Sprintf("http://%s@%s:%d", rpc.rpcAuth, rpc.rpcHost, rpc.rpcPort)
@@ -216,7 +216,7 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 	}
 	resp, err := http.Post(url, "application/json", strings.NewReader(string(data)))
 	if err != nil {
-		return errors.Wrap(err, "partRpc: Post")
+		return errors.Wrap(err, "Post failed")
 	}
 
 	defer resp.Body.Close()
@@ -224,7 +224,7 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 	//Debug(2, "partRpc: Response status: %s", resp.Status)
 
 	if resp.StatusCode != 200 {
-		return errors.Wrapf(err, "partRpc: Bad response status: %s", resp.Status)
+		return errors.Wrapf(err, "Bad response status: %s", resp.Status)
 	}
 
 	response := rpcResponse{}
@@ -238,8 +238,64 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 	}
 
 	if response.Err != "" {
-		return errors.Errorf("partRpc: RPC response error: %s", response.Err)
+		return errors.Errorf("RPC response error: %s", response.Err)
 	}
 
 	return nil
+}
+
+//GetNetworkInfo executes the "getnetworkinfo" command and returns results.
+func (rpc *ParticlRpc) GetNetworkInfo() (*NetworkInfo, error) {
+	var args []interface{}
+	var res NetworkInfo
+
+	err := rpc.CallRpc("getnetworkinfo", "", args, &res)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "ParticlRpc: getnetworkinfo failed")
+	}
+
+	return &res, nil
+}
+
+//GetBlockchainInfo executes the "getnetworkinfo" command and returns results.
+func (rpc *ParticlRpc) GetBlockchainInfo() (*BlockchainInfo, error) {
+	var args []interface{}
+	var res BlockchainInfo
+
+	err := rpc.CallRpc("getblockchaininfo", "", args, &res)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "ParticlRpc: getblockchaininfo failed")
+	}
+
+	return &res, nil
+}
+
+//GetStakingInfo executes the "getnetworkinfo" command and returns results.
+func (rpc *ParticlRpc) GetStakingInfo(wallet string) (*StakingInfo, error) {
+	var args []interface{}
+	var res StakingInfo
+
+	err := rpc.CallRpc("getstakinginfo", wallet, args, &res)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "ParticlRpc: getstakinginfo failed")
+	}
+
+	return &res, nil
+}
+
+//GetStakingInfo executes the "getnetworkinfo" command and returns results.
+func (rpc *ParticlRpc) GetUptime() (int64, error) {
+	var args []interface{}
+	var res int64
+
+	err := rpc.CallRpc("uptime", "", args, &res)
+
+	if err != nil {
+		return 0, errors.Wrap(err, "ParticlRpc: uptime failed")
+	}
+
+	return res, nil
 }
