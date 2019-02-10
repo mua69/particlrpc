@@ -221,10 +221,8 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 
 	defer resp.Body.Close()
 
-	//Debug(2, "partRpc: Response status: %s", resp.Status)
-
 	if resp.StatusCode != 200 {
-		return errors.Wrapf(err, "Bad response status: %s", resp.Status)
+		return errors.Errorf( "Bad response status: %s", resp.Status)
 	}
 
 	response := rpcResponse{}
