@@ -14,6 +14,7 @@ type ParticlRpc struct {
 	rpcHost string
 	rpcPort int
 	rpcAuth string
+	httpClient *http.Client
 }
 
 type Sat int64
@@ -116,6 +117,7 @@ func NewParticlRpc() *ParticlRpc {
 	rpc.dataDir = "."
 	rpc.rpcHost = "localhost"
 	rpc.rpcPort = 51735
+	rpc.httpClient = &http.Client{}
 
 	return rpc
 }
@@ -214,7 +216,7 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 	if wallet != "" {
 		url += "/wallet/" + wallet
 	}
-	resp, err := http.Post(url, "application/json", strings.NewReader(string(data)))
+	resp, err := rpc.httpClient.Post(url, "application/json", strings.NewReader(string(data)))
 	if err != nil {
 		return errors.Wrap(err, "Post failed")
 	}
