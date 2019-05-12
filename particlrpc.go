@@ -10,10 +10,10 @@ import (
 )
 
 type ParticlRpc struct {
-	dataDir string
-	rpcHost string
-	rpcPort int
-	rpcAuth string
+	dataDir    string
+	rpcHost    string
+	rpcPort    int
+	rpcAuth    string
 	httpClient *http.Client
 }
 
@@ -101,6 +101,17 @@ type Tx struct {
 	Vout      []TxVout `json:"vout"`
 	Time      int64    `json:"time"`
 	Blockhash string   `json:"blockhash"`
+}
+
+type Stakingoptions struct {
+	Rewardaddress string `json:"rewardaddress"`
+	Enabled       bool   `json:"enabled"`
+	Time          int64  `json:"time"`
+}
+
+type SetStakingoptions struct {
+	Rewardaddress string `json:"rewardaddress"`
+	Enabled       bool   `json:"enabled"`
 }
 
 type rpcResponse struct {
@@ -224,7 +235,7 @@ func (rpc *ParticlRpc) CallRpc(cmd string, wallet string, args []interface{}, re
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return errors.Errorf( "Bad response status: %s", resp.Status)
+		return errors.Errorf("Bad response status: %s", resp.Status)
 	}
 
 	response := rpcResponse{}
@@ -298,4 +309,28 @@ func (rpc *ParticlRpc) GetUptime() (int64, error) {
 	}
 
 	return res, nil
+}
+
+//SetStakingOptions sets staking options (staking enabled, reward address) for specified wallet and returns
+//current settings.
+func (rpc *ParticlRpc) SetStakingOptions(enabled bool, rewardaddress string, wallet string) (*Stakingoptions, error) {
+	var args []interface{}
+	var res struct {
+		Stakingoptions Stakingoptions `json:"stakingoptions"`
+	}
+
+	var options SetStakingoptions
+
+	options.Enabled = enabled
+	options.Rewardaddress = rewardaddress
+
+	args = append(args, "stakingoptions", options)
+
+	err := rpc.CallRpc("walletsettings", wallet, args, &res)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "ParticlRpc: walletsettings failed")
+	}
+
+	return &res.Stakingoptions, nil
 }
