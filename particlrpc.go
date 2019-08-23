@@ -104,14 +104,16 @@ type Tx struct {
 }
 
 type Stakingoptions struct {
-	Rewardaddress string `json:"rewardaddress"`
-	Enabled       bool   `json:"enabled"`
-	Time          int64  `json:"time"`
+	Rewardaddress     string  `json:"rewardaddress"`
+	Enabled           bool  `json:"enabled"`
+	Time              int64   `json:"time"`
+	Smsgfeeratetarget float64 `json:"smsgfeeratetarget"`
 }
 
 type SetStakingoptions struct {
-	Rewardaddress string `json:"rewardaddress"`
-	Enabled       bool   `json:"enabled"`
+	Rewardaddress     string  `json:"rewardaddress"`
+	Enabled           bool    `json:"enabled"`
+	Smsgfeeratetarget float64 `json:"smsgfeeratetarget"`
 }
 
 type rpcResponse struct {
@@ -313,7 +315,8 @@ func (rpc *ParticlRpc) GetUptime() (int64, error) {
 
 //SetStakingOptions sets staking options (staking enabled, reward address) for specified wallet and returns
 //current settings.
-func (rpc *ParticlRpc) SetStakingOptions(enabled bool, rewardaddress string, wallet string) (*Stakingoptions, error) {
+func (rpc *ParticlRpc) SetStakingOptions(enabled bool, rewardaddress string, smsgfeeratetarget float64,
+	wallet string) (*Stakingoptions, error) {
 	var args []interface{}
 	var res struct {
 		Stakingoptions Stakingoptions `json:"stakingoptions"`
@@ -323,13 +326,32 @@ func (rpc *ParticlRpc) SetStakingOptions(enabled bool, rewardaddress string, wal
 
 	options.Enabled = enabled
 	options.Rewardaddress = rewardaddress
+	options.Smsgfeeratetarget = smsgfeeratetarget
 
 	args = append(args, "stakingoptions", options)
 
 	err := rpc.CallRpc("walletsettings", wallet, args, &res)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "ParticlRpc: walletsettings failed")
+		return nil, errors.Wrap(err, "ParticlRpc: set walletsettings failed")
+	}
+
+	return &res.Stakingoptions, nil
+}
+
+//GetStakingOptions retuns currently set staking options
+func (rpc *ParticlRpc) GetStakingOptions(wallet string) (*Stakingoptions, error) {
+	var args []interface{}
+	var res struct {
+		Stakingoptions Stakingoptions `json:"stakingoptions"`
+	}
+
+	args = append(args, "stakingoptions")
+
+	err := rpc.CallRpc("walletsettings", wallet, args, &res)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "ParticlRpc: get walletsettings failed")
 	}
 
 	return &res.Stakingoptions, nil
