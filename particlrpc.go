@@ -30,14 +30,14 @@ type BlockchainInfo struct {
 }
 
 type StakingInfo struct {
-	Staking                   bool    `json:"staking"`
-	Cause                     string  `json:"cause"`
-	Weight                    int64   `json:"weight"`
-	Percentyearreward         float64 `json:"percentyearreward"`
-	Moneysupply               float64 `json:"moneysupply"`
-	Foundationdonationpercent float64 `json:"foundationdonationpercent"`
-	Netstakeweight            int64   `json:"netstakeweight"`
-	Expectedtime              int64   `json:"expectedtime"`
+	Staking                 bool    `json:"staking"`
+	Errors                  string  `json:"errors"`
+	Weight                  int64   `json:"weight"`
+	Percentyearreward       float64 `json:"percentyearreward"`
+	Moneysupply             float64 `json:"moneysupply"`
+	Treasurydonationpercent float64 `json:"treasurydonationpercent"`
+	Netstakeweight          int64   `json:"netstakeweight"`
+	Expectedtime            int64   `json:"expectedtime"`
 }
 
 type BlockRewardKernelScript struct {
@@ -105,7 +105,7 @@ type Tx struct {
 
 type Stakingoptions struct {
 	Rewardaddress     string  `json:"rewardaddress"`
-	Enabled           bool  `json:"enabled"`
+	Enabled           bool    `json:"enabled"`
 	Time              int64   `json:"time"`
 	Smsgfeeratetarget float64 `json:"smsgfeeratetarget"`
 }
